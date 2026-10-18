@@ -24,12 +24,23 @@ jobs:
       with:
         gradle-version: '8.2'
 
-    - name: Find Project and Build Debug APK
+    - name: Build APK
       run: |
-        if [ -f "settings.gradle.kts" ]; then
+        # ဇစ်ဖိုင်ပါလာပါက အလိုအလျောက် ဖြည်ပေးရန်
+        for z in *.zip; do
+          if [ -f "$z" ]; then
+            unzip -o "$z"
+          fi
+        done
+        
+        # Project တည်နေရာရှာပြီး Gradle ဖြင့် APK တည်ဆောက်ရန်
+        SETTINGS_FILE=$(find . -name "settings.gradle.kts" | head -n 1)
+        if [ -n "$SETTINGS_FILE" ]; then
+          cd "$(dirname "$SETTINGS_FILE")"
           gradle assembleDebug
         else
-          cd */ && gradle assembleDebug
+          echo "Settings file not found!"
+          exit 1
         fi
 
     - name: Upload APK
